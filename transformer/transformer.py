@@ -1,36 +1,67 @@
 import torch.nn as nn
 import torch
-from attention_head import MultiHeadedAttention, FeedForwardNetwork
+from transformer.attention_head import MultiHeadedAttention, FeedForwardNetwork
+from transformer.positional_encodings import PositionalEncodings
 
 class Transformer(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.encoder = nn.Sequential(
-            Tokenizer(),
-            nn.Embedding(),
-            PositionalEncoding(),      
-            MultiHeadedAttention(),     
-            nn.LayerNorm1d(),
-            FeedForwardNetwork(),
-            nn.LayerNorm1d(),      
+        self.decoder = nn.Sequential(
+            nn.Embedding(num_embeddings=50_257, embedding_dim=512),
+            PositionalEncodings(512),      
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+                  
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+
+            MultiHeadedAttention(n_heads=8, d_input=512, d_k=64),     
+            nn.LayerNorm(512),
+            FeedForwardNetwork(512),
+            nn.LayerNorm(512),
+
         )
 
-        #this takes in raw symnols
-        self.decoder = (
-            Tokenizer(),
-            Embedder(),
-            PositionalEncoding(),
-            MaskedAttentionHeads(),
-        )
-        #somewhere here i need to feed in encoder inputs
-        self.decoder_encoder = nn.Sequential(
-            AttentionHeads(),
-            AttentionHeads(),
-            AttentionHeads(),
-            AttentionHeads(),
-            AttentionHeads(),
-            AttentionHeads(),
-            nn.Linear(),
-            nn.Softmax()
-        )
+    def forward(self, X):
+        last_token = self.decoder(X)[-1]
+        proj = nn.Linear(512, 50_257)
+        
+        output = proj(last_token)
+        output = torch.softmax(output)
+        return output
+    
+    def tokenize_input(self, in_str):
+        return self.tkn.encode(in_str)
+
+    def most_likely_token(self, in_str):
+        return in_str.index(max(in_str))
+
+    def generate_output(self):
+        ctx_encoded = self.tokenize_input(self.ctx)
+        for i in range(0, 100):
+            forwarded = self.forward(ctx_encoded)
+            mlt = self.most_likely_token(forwarded)
+            ctx_encoded.append(mlt)
+            ctx_encoded = ctx_encoded[1:]
+        return self.tkn.decode(ctx_encoded[-100:])
+    
