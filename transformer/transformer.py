@@ -1,21 +1,20 @@
 import torch.nn as nn
 import torch
-from attention_head import AttentionHeads
+from attention_head import MultiHeadedAttention, FeedForwardNetwork
 
 class Transformer(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.encoder = nn.Sequential([
+        self.encoder = nn.Sequential(
             Tokenizer(),
-            PositionalEncoding(),
-            AttentionHeads(),
-            ResdiualConnections(),
+            nn.Embedding(),
+            PositionalEncoding(),      
+            MultiHeadedAttention(),     
             nn.LayerNorm1d(),
             FeedForwardNetwork(),
-            ResdiualConnections(),
             nn.LayerNorm1d(),      
-        ])
+        )
 
         #this takes in raw symnols
         self.decoder = (
@@ -25,7 +24,7 @@ class Transformer(nn.Module):
             MaskedAttentionHeads(),
         )
         #somewhere here i need to feed in encoder inputs
-        self.decoder_encoder = nn.Sequential([
+        self.decoder_encoder = nn.Sequential(
             AttentionHeads(),
             AttentionHeads(),
             AttentionHeads(),
@@ -34,4 +33,4 @@ class Transformer(nn.Module):
             AttentionHeads(),
             nn.Linear(),
             nn.Softmax()
-        ])
+        )
