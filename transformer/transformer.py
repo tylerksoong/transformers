@@ -6,7 +6,7 @@ from transformer.positional_encodings import PositionalEncodings
 class Transformer(nn.Module):
     def __init__(self):
         super().__init__()
-
+        self.proj = nn.Linear(512, 50_257, device="mps")
         self.decoder = nn.Sequential(
             nn.Embedding(num_embeddings=50_257, embedding_dim=512, device='mps'),
             PositionalEncodings(512),      
@@ -43,11 +43,8 @@ class Transformer(nn.Module):
         )
 
     def forward(self, X):
-        last_token = self.decoder(X)[-1]
-        proj = nn.Linear(512, 50_257, device="mps")
-        
-        output = proj(last_token)
-        output = torch.softmax(output, dim=0)
+        last_token = self.decoder(X)
+        output = self.proj(last_token)
         return output
     
     def tokenize_input(self, in_str):
