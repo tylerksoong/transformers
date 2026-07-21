@@ -45,9 +45,8 @@ class Transformer(nn.Module):
         self.tkn = tiktoken.get_encoding("r50k_base")
 
     def forward(self, X):
-        last_token = self.decoder(X)
-        output = self.proj(last_token[-1])
-        output = torch.softmax(output, dim=0)
+        new = self.decoder(X)
+        output = self.proj(new)
         return output
     
     def tokenize_input(self, in_str):
