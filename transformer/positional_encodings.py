@@ -12,7 +12,7 @@ class PositionalEncodings(nn.Module):
             angle = pos / (10000 ** ((i//2 * 2) / 10))
             return torch.where(i % 2 == 0, torch.sin(angle), torch.cos(angle))
 
-        dim = X.size(0)
+        dim = X.size(1)
 
         pos = torch.arange(dim, device=self.device).unsqueeze(1)
         i = torch.arange(self.d, device=self.device)
