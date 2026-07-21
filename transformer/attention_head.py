@@ -37,8 +37,6 @@ class AttentionHead(nn.Module):
 
         delta_e = torch.matmul(matrix, V)
 
-        print(delta_e.shape)
-
         new_x = X + delta_e
         return new_x
 
