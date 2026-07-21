@@ -12,40 +12,41 @@ class Transformer(nn.Module):
             nn.Embedding(num_embeddings=50_258, embedding_dim=512, device=self.device),
             PositionalEncodings(512, device=self.device),      
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
                   
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
 
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
 
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
 
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
 
             MultiHeadedAttention(n_heads=8, d_input=512, d_k=64, device=self.device),     
-            nn.LayerNorm(512),
+            nn.LayerNorm(512, device=self.device),
             FeedForwardNetwork(512, device=self.device),
-            nn.LayerNorm(512),
-
+            nn.LayerNorm(512, device=self.device),
         )
 
     def forward(self, X):
         last_token = self.decoder(X)
-        output = self.proj(last_token)
+        output = self.proj(last_token[-1])
+        output = torch.softmax(output, dim=0)
+        print(output)
         return output
     
     def tokenize_input(self, in_str):

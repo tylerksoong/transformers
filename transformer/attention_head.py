@@ -28,14 +28,16 @@ class AttentionHead(nn.Module):
         K = self.W_k(X)
         V = self.W_v(X)
         matrix = torch.matmul(Q, K.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.d, dtype=torch.float32, device=self.device))
-        
-        mask = torch.full((X.size(1), X.size(1)), float('-inf'), device=self.device)
+        mask = torch.full((X.size(0), X.size(0)), float('-inf'), device=self.device)
         mask = torch.triu(mask, diagonal=1)
 
         matrix = matrix + mask
 
         matrix = torch.softmax(matrix, dim=1)
+
         delta_e = torch.matmul(matrix, V)
+
+        print(delta_e.shape)
 
         new_x = X + delta_e
         return new_x
