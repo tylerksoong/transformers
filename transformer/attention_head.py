@@ -6,7 +6,7 @@ class MultiHeadedAttention(nn.Module):
     def __init__(self, n_heads, d_input, d_k, device):
         super().__init__()
         self.device = device
-        self.attention_heads = [AttentionHead(d_input, d_k, self.device) for _ in range(n_heads)]
+        self.attention_heads = nn.ModuleList([AttentionHead(d_input, d_k, self.device) for _ in range(n_heads)])
         self.W_o = nn.Linear(n_heads * d_input, d_input, device=self.device)
 
     def forward(self, X):
