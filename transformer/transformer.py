@@ -58,11 +58,11 @@ class Transformer(nn.Module):
     def generate_output(self, input_str):
 
         for i in range(0, 100):
-            ctx_encoded = torch.tensor(self.tokenize_input(input_str), device=self.device)
+            ctx_encoded = torch.tensor([self.tokenize_input(input_str)], device=self.device)
             forwarded = self.forward(ctx_encoded)
-            mlt = self.most_likely_token(forwarded)
+            mlt = self.most_likely_token(forwarded[0, -1])
             input_str += mlt
             print(input_str + "\n\n")
             
-        return self.tkn.decode(ctx_encoded.tolist())
+        return self.tkn.decode(ctx_encoded.squeeze(0).tolist())
     
